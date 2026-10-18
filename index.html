@@ -6,243 +6,154 @@
     <title>Digital Care Package</title>
     <style>
         :root {
-            --bg-color: #f4f1ea; /* Fond crème chaleureux */
-            --text-color: #5c4a3d; /* Marron doux rétro */
-            --accent-color: #d1bfae;
+            --bg-window: #FDFBF7; /* Crème très clair */
+            --text-dark: #4A3B32; /* Marron foncé vintage */
+            --border-retro: #D1C7BD;
         }
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            /* Ciel en pixel art animé (Image temporaire pour l'ambiance) */
+            background: #87CEEB url('https://i.pinimg.com/originals/81/29/7c/81297cc8c9c99d2568b209d0eb61e9dc.gif') center/cover fixed;
+            font-family: 'Times New Roman', serif;
+            color: var(--text-dark);
             margin: 0;
-            padding: 20px;
+            padding: 40px 20px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
+            align-items: flex-start;
             min-height: 100vh;
         }
-        h1, h2 {
-            font-family: 'Georgia', serif;
+
+        /* La fenêtre principale style vieux Mac/Windows */
+        .window-container {
+            background: var(--bg-window);
+            border: 2px solid var(--border-retro);
+            border-radius: 12px;
+            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.15); /* Ombre dure rétro */
+            padding: 40px;
+            max-width: 650px;
+            width: 100%;
             text-align: center;
+            position: relative;
         }
-        /* Atelier (Création) */
-        #atelier {
-            background: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            max-width: 500px;
-            width: 100%;
-        }
-        .input-group { margin-bottom: 20px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; }
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--accent-color);
-            border-radius: 5px;
-            font-family: 'Courier New', Courier, monospace;
-            box-sizing: border-box;
-        }
-        canvas {
-            border: 1px dashed var(--accent-color);
-            cursor: crosshair;
-            background: #faf8f5;
-        }
-        button {
-            background-color: var(--text-color);
+
+        /* Barre supérieure de la fenêtre */
+        .window-container::before {
+            content: "•••";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 30px;
+            background: var(--border-retro);
+            border-radius: 10px 10px 0 0;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            font-family: 'Georgia', serif;
-            transition: 0.3s;
+            font-size: 24px;
+            line-height: 30px;
+            text-align: left;
+            padding-left: 15px;
+            letter-spacing: 2px;
         }
-        button:hover { background-color: #3e3229; }
-        
-        /* Réception du Colis */
-        #package { display: none; text-align: center; width: 100%; max-width: 600px; }
-        .box-title { font-size: 24px; font-style: italic; margin-bottom: 30px; }
+
+        .box-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            color: #8B3A3A; /* Rouge bordeaux doux */
+        }
+
+        /* Grille des objets réels */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 30px;
         }
+
         .item {
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.3s ease, filter 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .item:hover { transform: scale(1.05); }
-        .item-icon {
-            font-size: 50px; /* Remplace ceci par des images réelles plus tard via <img> */
-            margin-bottom: 10px;
+
+        .item:hover {
+            transform: translateY(-5px) scale(1.05);
+            filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.2));
         }
-        .item-label { font-size: 14px; letter-spacing: 1px; }
+
+        /* Emplacement pour tes vraies images détourées */
+        .item img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            /* Si l'image n'est pas encore chargée, on met un fond gris doux */
+            background-color: transparent; 
+        }
+
+        .item-label {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: var(--text-dark);
+            background: rgba(209, 199, 189, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* Masquer l'atelier par défaut pour voir l'esthétique du colis */
+        #atelier { display: none; }
         
-        /* Pop-up (Modal) */
-        #modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); justify-content: center; align-items: center;
-            z-index: 1000;
+        /* Boutons rétro */
+        button {
+            background: transparent;
+            border: 2px solid var(--text-dark);
+            color: var(--text-dark);
+            padding: 10px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
         }
-        .modal-content {
-            background: #fffdf9;
-            padding: 40px;
-            border-radius: 12px;
-            max-width: 400px;
-            width: 90%;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
+        button:hover {
+            background: var(--text-dark);
+            color: var(--bg-window);
         }
-        .close-btn {
-            position: absolute; top: 15px; right: 20px; font-size: 24px;
-            cursor: pointer; color: #888;
-        }
-        .typewriter-text { font-family: 'Courier New', Courier, monospace; white-space: pre-wrap; text-align: left;}
-        #expiration-message { display: none; font-size: 20px; text-align: center; margin-top: 20vh; font-style: italic; }
     </style>
 </head>
 <body>
 
-    <!-- MESSAGE D'EXPIRATION -->
-    <div id="expiration-message">
-        Connection lost. This digital care package has expired.
-    </div>
-
-    <!-- ATELIER DE CRÉATION -->
-    <div id="atelier">
-        <h2>Atelier de Création</h2>
-        <div class="input-group">
-            <label>1. Ta lettre (Machine à écrire)</label>
-            <textarea id="letter-input" rows="5" placeholder="Tape ton mot doux ici..."></textarea>
-        </div>
-        <div class="input-group">
-            <label>2. Lien d'une musique (Spotify/YouTube)</label>
-            <input type="text" id="music-input" placeholder="https://...">
-        </div>
-        <div class="input-group">
-            <label>3. Fais un petit dessin (Carnet)</label>
-            <canvas id="drawing-canvas" width="300" height="200"></canvas>
-            <button onclick="clearCanvas()" style="margin-top:10px; background:#d1bfae; color:#5c4a3d;">Effacer le dessin</button>
-        </div>
-        <button onclick="sealPackage()">Sceller le colis ✨</button>
-        <p id="link-output" style="word-wrap: break-word; font-size: 12px; margin-top: 20px;"></p>
-    </div>
-
-    <!-- VUE DU COLIS (Pour l'ami) -->
-    <div id="package">
-        <div class="box-title">I've been thinking about you...</div>
-        <!-- L'image de la boîte pourrait être ajoutée ici -->
-        <div style="font-size: 80px;">📦</div> 
+    <div class="window-container" id="package">
+        <!-- L'image de ta boîte en carton fermée ira ici -->
+        <img src="https://cdn-icons-png.flaticon.com/512/3258/3258525.png" alt="Cardboard Box" style="width: 150px; margin-bottom: 20px; opacity: 0.8;">
+        
+        <div class="box-title">you've got mail...</div>
         
         <div class="grid">
-            <div class="item" onclick="openModal('letter')">
-                <div class="item-icon"> typewriter </div>
+            <!-- Objet 1 : Machine à écrire -->
+            <div class="item">
+                <!-- Remplace le lien 'src' par TA photo de machine à écrire -->
+                <img src="https://cdn-icons-png.flaticon.com/512/3063/3063205.png" alt="Typewriter">
                 <div class="item-label">note</div>
             </div>
-            <div class="item" onclick="openModal('music')">
-                <div class="item-icon"> mp3 player </div>
+
+            <!-- Objet 2 : iPod / MP3 -->
+            <div class="item">
+                <!-- Remplace le lien 'src' par TA photo d'iPod -->
+                <img src="https://cdn-icons-png.flaticon.com/512/17/17791.png" alt="MP3 Player">
                 <div class="item-label">song</div>
             </div>
-            <div class="item" onclick="openModal('drawing')">
-                <div class="item-icon"> sketchbook </div>
-                <div class="item-label">drawing</div>
+
+            <!-- Objet 3 : Polaroïd -->
+            <div class="item">
+                <!-- Remplace le lien 'src' par TA photo de Polaroïd -->
+                <img src="https://cdn-icons-png.flaticon.com/512/3342/3342137.png" alt="Polaroid">
+                <div class="item-label">photo</div>
             </div>
         </div>
-        
-        <div style="margin-top: 50px;">
-            <textarea id="friend-note" placeholder="Laisser un petit mot en retour..." rows="2" style="width: 80%;"></textarea>
-            <button style="width: auto; margin-top: 10px;" onclick="alert('Note sauvegardée virtuellement !')">Envoyer</button>
-        </div>
     </div>
 
-    <!-- FENÊTRE POP-UP -->
-    <div id="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modal-body"></div>
-        </div>
-    </div>
-
-    <script>
-        // Logique de Dessin
-        const canvas = document.getElementById('drawing-canvas');
-        const ctx = canvas.getContext('2d');
-        let isDrawing = false;
-        canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('mousemove', draw);
-        function draw(e) {
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#2c3e50';
-            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        }
-        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); }
-
-        // Récupération des données du colis
-        let packageData = {};
-        const urlParams = new URLSearchParams(window.location.search);
-        const boxCode = urlParams.get('box');
-
-        if (boxCode) {
-            // Mode Vue de l'Ami
-            document.getElementById('atelier').style.display = 'none';
-            try {
-                packageData = JSON.parse(decodeURIComponent(escape(atob(boxCode))));
-                const now = new Date().getTime();
-                const hoursPassed = (now - packageData.timestamp) / (1000 * 60 * 60);
-                
-                if (hoursPassed > 48) {
-                    document.getElementById('expiration-message').style.display = 'block';
-                } else {
-                    document.getElementById('package').style.display = 'block';
-                }
-            } catch (e) {
-                document.getElementById('expiration-message').innerText = "Le lien est corrompu.";
-                document.getElementById('expiration-message').style.display = 'block';
-            }
-        }
-
-        // Création du colis
-        function sealPackage() {
-            const data = {
-                letter: document.getElementById('letter-input').value,
-                music: document.getElementById('music-input').value,
-                drawing: canvas.toDataURL(),
-                timestamp: new Date().getTime()
-            };
-            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-            const url = window.location.origin + window.location.pathname + "?box=" + encoded;
-            document.getElementById('link-output').innerHTML = `<strong>Ton lien secret à envoyer :</strong><br><a href="${url}">${url}</a>`;
-        }
-
-        // Gestion du Pop-up
-        function openModal(type) {
-            const body = document.getElementById('modal-body');
-            if (type === 'letter') {
-                body.innerHTML = `<div class="typewriter-text">${packageData.letter || 'Rien d\'écrit...'}</div>`;
-            } else if (type === 'music') {
-                body.innerHTML = `🎵 <a href="${packageData.music}" target="_blank">Écouter la chanson choisie</a>`;
-            } else if (type === 'drawing') {
-                body.innerHTML = `<img src="${packageData.drawing}" style="width:100%; border:1px solid #ccc;">`;
-            }
-            document.getElementById('modal').style.display = 'flex';
-        }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; } 
-    </script>
 </body>
 </html>
