@@ -1,247 +1,810 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Care Package</title>
+    <!-- Polices Google Fonts pour l'écriture manuscrite et machine à écrire -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+    <!-- Bibliothèque de compression pour raccourcir le lien au maximum -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    
     <style>
         :root {
-            --bg-window: #FDFBF7;
-            --text-dark: #4A3B32;
-            --border-retro: #D1C7BD;
+            --wood-dark: #4a3222;
+            --wood-light: #6e4c36;
+            --kraft-box: #cba882;
+            --kraft-inside: #b5926d;
+            --kraft-shadow: #8c6d4d;
+            --paper-cream: #fdfaf3;
+            --ink-color: #2b2523;
         }
+
+        * { box-sizing: border-box; }
+
         body {
-            /* Le ciel pixel art en fond */
-            background: #87CEEB url('https://i.pinimg.com/originals/81/29/7c/81297cc8c9c99d2568b209d0eb61e9dc.gif') center/cover fixed;
-            font-family: 'Courier New', Courier, monospace;
-            color: var(--text-dark);
             margin: 0;
-            padding: 40px 20px;
+            padding: 30px 15px;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-
-        /* La fenêtre principale style vieux Mac/Windows */
-        .window-container {
-            background: var(--bg-window);
-            border: 2px solid var(--border-retro);
-            border-radius: 12px;
-            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.15);
-            padding: 40px;
-            max-width: 650px;
-            width: 100%;
-            text-align: center;
+            align-items: center;
+            font-family: 'Courier Prime', monospace;
+            color: var(--ink-color);
+            overflow-x: hidden;
             position: relative;
+            /* Texture de bureau en bois chaleureux */
+            background-color: var(--wood-light);
+            background-image: 
+                radial-gradient(rgba(0,0,0,0.35) 15%, transparent 85%),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 10px),
+                linear-gradient(0deg, #4d3323 0%, #6e4c36 50%, #4d3323 100%);
         }
 
-        /* Barre supérieure de la fenêtre */
-        .window-container::before {
-            content: "•••";
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 30px;
-            background: var(--border-retro);
-            border-radius: 10px 10px 0 0;
-            color: white;
-            font-size: 24px;
-            line-height: 30px;
-            text-align: left;
-            padding-left: 15px;
-            letter-spacing: 2px;
+        /* --- DÉTAILS DU BUREAU "MESSY & CUTE" --- */
+        .desk-clutter {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            user-select: none;
+            filter: drop-shadow(3px 5px 5px rgba(0,0,0,0.4));
+        }
+        .clutter-note {
+            top: 6%; left: 6%;
+            background: #fff8a6;
+            padding: 15px 20px;
+            font-family: 'Caveat', cursive;
+            font-size: 22px;
+            transform: rotate(-8deg);
+            box-shadow: 2px 4px 8px rgba(0,0,0,0.25);
+            color: #444;
+        }
+        .clutter-note::before {
+            content: ""; position: absolute; top: -10px; left: 35%;
+            width: 50px; height: 20px; background: rgba(255, 182, 193, 0.7);
+            transform: rotate(4deg);
+        }
+        .clutter-coffee {
+            bottom: -20px; right: 4%;
+            width: 150px; height: 150px;
+            border: 14px solid rgba(60, 35, 18, 0.25);
+            border-radius: 50%;
+            transform: rotate(25deg);
+            filter: none;
+        }
+        .clutter-clips {
+            top: 12%; right: 10%;
+            font-size: 40px;
+            transform: rotate(35deg);
+        }
+        .clutter-pencil {
+            bottom: 10%; left: 8%;
+            font-size: 55px;
+            transform: rotate(-25deg);
         }
 
-        h2, .box-title {
-            font-family: 'Georgia', serif;
-            font-size: 24px;
-            margin-top: 10px;
-            color: #8B3A3A;
-            font-style: italic;
-        }
-
-        /* --- STYLES ATELIER --- */
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; }
-        input[type="text"], textarea {
+        /* --- CADRE BOÎTE EN CARTON / PAPIER KRAFT --- */
+        .cardboard-box {
+            background-color: var(--kraft-inside);
+            background-image: radial-gradient(rgba(0,0,0,0.07) 1px, transparent 0);
+            background-size: 16px 16px;
+            border: 18px solid var(--kraft-box);
+            outline: 2px dashed rgba(92, 64, 40, 0.4);
+            outline-offset: -10px;
+            border-radius: 6px;
+            box-shadow: 
+                inset 0 0 45px rgba(55, 35, 15, 0.65), /* Profondeur de la boîte */
+                0 25px 50px rgba(0,0,0,0.65); /* Ombre sur le bureau en bois */
+            padding: 35px;
+            max-width: 720px;
             width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-retro);
-            border-radius: 5px;
-            font-family: 'Courier New', Courier, monospace;
-            box-sizing: border-box;
+            min-height: 520px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Scotchs sur les coins de la boîte */
+        .box-tape-corner {
+            position: absolute;
+            width: 90px; height: 32px;
+            background: rgba(245, 235, 210, 0.55);
+            border-left: 2px dotted rgba(0,0,0,0.1);
+            border-right: 2px dotted rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            pointer-events: none;
+            z-index: 15;
+        }
+        .tape-tl { top: -22px; left: -25px; transform: rotate(-40deg); }
+        .tape-br { bottom: -22px; right: -25px; transform: rotate(-40deg); }
+
+        /* --- ATELIER DE CRÉATION --- */
+        #atelier {
+            background: var(--paper-cream);
+            padding: 25px 30px;
+            border-radius: 4px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            transform: rotate(-0.5deg);
+        }
+        .atelier-title {
+            font-family: 'Special Elite', monospace;
+            text-align: center;
+            color: #6e352c;
+            margin-top: 0;
+            border-bottom: 2px dashed #d5c8b8;
+            padding-bottom: 12px;
+        }
+        .section-box {
+            background: #f6f1e6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            border: 1px solid #e2d9c8;
+        }
+        .section-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #5a3e2e;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 8px 10px;
+            margin-top: 5px;
+            margin-bottom: 8px;
+            border: 1px solid #cbbba8;
+            border-radius: 4px;
+            font-family: 'Courier Prime', monospace;
             background: #fff;
         }
-        
-        button {
-            background-color: var(--bg-window);
-            color: var(--text-dark);
-            border: 2px solid var(--text-dark);
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 8px;
+        /* Zone Drag & Drop Polaroid */
+        #drop-zone {
+            border: 2px dashed #a8947e;
+            border-radius: 6px;
+            padding: 18px;
+            text-align: center;
+            background: #fcf9f2;
             cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 10px;
+        }
+        #drop-zone.dragover { background: #e8dec8; border-color: #5a3e2e; }
+        #polaroid-preview-img {
+            max-width: 100px; max-height: 100px;
+            display: none; margin: 8px auto;
+            border: 4px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .custom-row { display: flex; gap: 10px; }
+        .custom-row > div { flex: 1; }
+
+        /* Mini outil de dessin */
+        .canvas-container { text-align: center; }
+        canvas {
+            background: #fff;
+            border: 1px solid #cbbba8;
+            border-radius: 4px;
+            cursor: crosshair;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+            touch-action: none;
+        }
+        .draw-tools {
+            display: flex; justify-content: center; gap: 8px; margin-top: 8px;
+        }
+        .color-dot {
+            width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+            border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .btn-main {
+            background: #6e352c; color: #fff;
+            border: none; padding: 14px; width: 100%;
+            font-family: 'Special Elite', monospace;
+            font-size: 18px; border-radius: 4px;
+            cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 0 #421e18;
+        }
+        .btn-main:hover { transform: translateY(2px); box-shadow: 0 2px 0 #421e18; }
+
+        /* --- VUE DU COLIS (POUR L'AMI) --- */
+        #package-view { display: none; text-align: center; }
+        
+        /* Étiquette d'expédition en haut de la boîte */
+        .shipping-header {
+            background: var(--paper-cream);
+            border: 2px solid #222;
+            padding: 10px 20px;
+            display: inline-block;
+            transform: rotate(-1.5deg);
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.25);
+            margin-bottom: 15px;
+        }
+        .shipping-header h1 {
+            font-family: 'Special Elite', monospace;
+            font-size: 20px; margin: 0; color: #8B3A3A;
+        }
+        .shipping-sub { font-size: 11px; letter-spacing: 2px; border-top: 1px solid #222; margin-top: 4px; padding-top: 3px; }
+
+        /* Zone où les objets sont éparpillés en vrac */
+        .scattered-area {
+            position: relative;
             width: 100%;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            transition: 0.3s;
+            height: 410px;
             margin-top: 10px;
         }
-        button:hover { background-color: var(--text-dark); color: var(--bg-window); }
 
-        /* --- STYLES COLIS (RECEPTION) --- */
-        #package { display: none; } /* Caché par défaut */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin-top: 30px;
-        }
-        .item {
+        .scattered-item {
+            position: absolute;
             cursor: pointer;
-            transition: transform 0.3s ease, filter 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
+            filter: drop-shadow(5px 10px 8px rgba(0,0,0,0.38));
+            user-select: none;
         }
-        .item:hover {
-            transform: translateY(-5px) scale(1.05);
-            filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.1));
-        }
-        .item img {
-            width: 90px;
-            height: 90px;
+        .scattered-item img {
+            width: 135px; height: 135px;
             object-fit: contain;
-            margin-bottom: 12px;
-        }
-        .item-label {
-            font-size: 14px;
-            background: rgba(209, 199, 189, 0.3);
-            padding: 2px 8px;
-            border-radius: 4px;
+            display: block;
         }
 
-        /* --- POP-UP --- */
-        #modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); justify-content: center; align-items: center;
+        /* Positions éparpillées et penchées */
+        .pos-typewriter { top: 20px; left: 8%; transform: rotate(-11deg); }
+        .pos-ipod       { top: 30px; right: 10%; transform: rotate(14deg); }
+        .pos-polaroid   { bottom: 25px; left: 14%; transform: rotate(8deg); }
+        .pos-sketch     { bottom: 20px; right: 12%; transform: rotate(-15deg); }
+
+        .scattered-item:hover {
+            z-index: 30;
+            filter: drop-shadow(8px 16px 14px rgba(0,0,0,0.5));
+        }
+        .pos-typewriter:hover { transform: rotate(-5deg) scale(1.08); }
+        .pos-ipod:hover       { transform: rotate(8deg) scale(1.08); }
+        .pos-polaroid:hover   { transform: rotate(3deg) scale(1.08); }
+        .pos-sketch:hover     { transform: rotate(-8deg) scale(1.08); }
+
+        /* L'EFFET SCRAPBOOK : Étiquette Masking Tape qui apparaît au survol */
+        .scrapbook-tape {
+            position: absolute;
+            top: -18px; left: 50%;
+            transform: translateX(-50%) rotate(-6deg) scale(0.7);
+            background: #f7ebd2;
+            border-left: 3px dotted rgba(0,0,0,0.15);
+            border-right: 3px dotted rgba(0,0,0,0.15);
+            padding: 3px 14px;
+            font-family: 'Caveat', cursive;
+            font-size: 22px;
+            color: #3b2a1e;
+            white-space: nowrap;
+            box-shadow: 1px 3px 6px rgba(0,0,0,0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+        }
+        .scattered-item:hover .scrapbook-tape {
+            opacity: 1;
+            transform: translateX(-50%) rotate(-4deg) scale(1);
+            top: -26px;
+        }
+
+        /* --- LE ZOOM IMMERSIF (POP-UPS RÉALISTES) --- */
+        #immersive-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 12, 6, 0.78);
+            backdrop-filter: blur(4px);
             z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .modal-content {
-            background: var(--bg-window);
-            padding: 40px;
-            border-radius: 12px;
-            max-width: 400px;
-            width: 90%;
+
+        .zoom-item-wrapper {
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: zoomSlideUp 0.35s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+        @keyframes zoomSlideUp {
+            from { transform: translateY(60px) scale(0.8); opacity: 0; }
+            to   { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .close- immersive {
+            position: fixed; top: 25px; right: 35px;
+            color: #fff; font-size: 40px; cursor: pointer;
+            font-family: sans-serif; z-index: 1010;
+        }
+
+        /* 1. Zoom Feuille de Machine à Écrire */
+        .zoomed-paper {
+            background: #fdfaf0;
+            background-image: repeating-linear-gradient(#fdfaf0 0px, #fdfaf0 27px, #e8e2d5 28px);
+            width: 90vw; max-width: 440px; min-height: 460px;
+            padding: 45px 35px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            font-family: 'Special Elite', monospace;
+            font-size: 17px; line-height: 28px;
+            color: #222;
+            white-space: pre-wrap;
+            text-align: left;
+            transform: rotate(-1deg);
+            position: relative;
+        }
+
+        /* 2. Zoom Lecteur MP3 Style iPod Apple */
+        .zoomed-ipod {
+            width: 270px; height: 430px;
+            background: linear-gradient(135deg, #f7f7f7 0%, #dcdcdc 100%);
+            border-radius: 32px;
+            padding: 22px;
+            box-shadow: 
+                inset 0 2px 6px rgba(255,255,255,0.9),
+                inset 0 -5px 10px rgba(0,0,0,0.2),
+                0 25px 50px rgba(0,0,0,0.75);
+            border: 2px solid #bbb;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .ipod-screen {
+            width: 100%; height: 165px;
+            background: #c5d6cb;
+            border: 4px solid #444;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Courier Prime', monospace;
+            display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.25);
             text-align: center;
-            border: 2px solid var(--border-retro);
         }
-        .close-btn {
-            position: absolute; top: 10px; right: 15px; font-size: 24px;
-            cursor: pointer; color: var(--text-dark);
+        .ipod-topbar { font-size: 11px; border-bottom: 1px solid #7a8c80; padding-bottom: 3px; display: flex; justify-content: space-between; font-weight: bold;}
+        .ipod-wheel {
+            width: 165px; height: 165px;
+            background: #fff;
+            border-radius: 50%;
+            margin-top: 32px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            display: flex; justify-content: center; align-items: center;
+            border: 1px solid #ddd;
         }
-        .typewriter-text { white-space: pre-wrap; text-align: left; }
+        .wheel-label { position: absolute; font-family: sans-serif; font-size: 10px; font-weight: bold; color: #888; letter-spacing: 1px; }
+        .w-menu { top: 12px; } .w-prev { left: 12px; } .w-next { right: 12px; } .w-play { bottom: 12px; }
+        .ipod-center-btn {
+            width: 62px; height: 62px;
+            background: linear-gradient(135deg, #e2e2e2, #cccccc);
+            border-radius: 50%;
+            border: 1px solid #aaa;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 11px; font-weight: bold; color: #333;
+            text-decoration: none;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.8);
+        }
+        .ipod-center-btn:hover { background: #d0d0d0; transform: scale(0.97); }
+
+        /* 3. Zoom Grand Polaroïd Customisé */
+        .zoomed-polaroid {
+            background: #fff;
+            padding: 18px 18px 55px 18px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.7);
+            max-width: 340px; width: 90vw;
+            position: relative;
+            transform: rotate(1.5deg);
+            text-align: center;
+        }
+        .zoomed-polaroid img {
+            width: 100%; height: 270px;
+            object-fit: cover;
+            border: 1px solid #eee;
+            filter: contrast(1.05) sepia(0.08); /* Léger filtre rétro */
+        }
+        .polaroid-caption {
+            font-family: 'Caveat', cursive;
+            font-size: 28px;
+            color: #222;
+            margin-top: 15px;
+        }
+        .polaroid-sticker {
+            position: absolute;
+            bottom: 48px; right: 24px;
+            font-size: 42px;
+            transform: rotate(12deg);
+            filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));
+        }
+        /* Fixations Polaroïd (Washi, Punaise, Trombone) */
+        .attach-washi {
+            position: absolute; top: -16px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+            width: 110px; height: 32px;
+            background: rgba(235, 145, 160, 0.78);
+            border-left: 2px dotted rgba(255,255,255,0.6);
+            border-right: 2px dotted rgba(255,255,255,0.6);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .attach-pin {
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            font-size: 32px; filter: drop-shadow(2px 4px 3px rgba(0,0,0,0.4));
+        }
+        .attach-clip {
+            position: absolute; top: -22px; left: 30px;
+            font-size: 42px; transform: rotate(-10deg);
+        }
+
+        /* 4. Zoom Carnet de Croquis */
+        .zoomed-sketchbook {
+            background: #fffdf9;
+            padding: 30px 25px 25px 25px;
+            border-radius: 4px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.7);
+            max-width: 360px; width: 90vw;
+            border-top: 14px dotted #555; /* Effet reliure spirale */
+            text-align: center;
+            transform: rotate(-1deg);
+        }
+        .zoomed-sketchbook img { width: 100%; border: 1px solid #eee; }
+
+        /* Message d'expiration */
+        #expired-view {
+            display: none; text-align: center; padding: 60px 20px;
+            background: var(--paper-cream); border-radius: 6px;
+        }
+
+        @media (max-width: 550px) {
+            .scattered-item img { width: 105px; height: 105px; }
+            .cardboard-box { padding: 20px 15px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- FENÊTRE PRINCIPALE -->
-    <div class="window-container">
-        
-        <!-- 1. ATELIER DE CRÉATION (Visible pour toi) -->
+    <!-- DÉTAILS DU BUREAU EN BOIS (MESSY CUTE) -->
+    <div class="desk-clutter clutter-note">don't forget<br>to smile ★</div>
+    <div class="desk-clutter clutter-coffee"></div>
+    <div class="desk-clutter clutter-clips">📎</div>
+    <div class="desk-clutter clutter-pencil">✏️</div>
+
+    <!-- CADRE BOÎTE EN CARTON POSÉE SUR LE BUREAU -->
+    <div class="cardboard-box">
+        <div class="box-tape-corner tape-tl"></div>
+        <div class="box-tape-corner tape-br"></div>
+
+        <!-- 1. MESSAGE EXPIRÉ (48H) -->
+        <div id="expired-view">
+            <h2 style="font-family:'Special Elite', monospace; color:#8B3A3A;">This little package has safely faded into the ether...</h2>
+            <p>The 48-hour magic has expired, but the thought remains ♥</p>
+        </div>
+
+        <!-- 2. ATELIER DE CRÉATION -->
         <div id="atelier">
-            <h2>Ton Atelier Secret</h2>
-            <div class="input-group">
-                <label>1. Ta lettre</label>
-                <textarea id="letter-input" rows="4" placeholder="Tape ton mot doux ici..."></textarea>
+            <h2 class="atelier-title">✨ Digital Care Package Atelier ✨</h2>
+
+            <!-- En-tête du colis -->
+            <div class="section-box">
+                <h3>📦 1. Étiquette de la boîte</h3>
+                <label>Phrase d'accueil (en haut du colis) :</label>
+                <select id="greeting-input">
+                    <option value="I've been thinking about you...">I've been thinking about you...</option>
+                    <option value="You've got mail...">You've got mail...</option>
+                    <option value="A little box of goodies for you ♥">A little box of goodies for you ♥</option>
+                </select>
+                <input type="text" id="recipient-input" placeholder="Pour : (Prénom de ton ami) et De : (Ton prénom)">
             </div>
-            <div class="input-group">
-                <label>2. Lien d'une musique (Spotify/Deezer)</label>
-                <input type="text" id="music-input" placeholder="https://...">
+
+            <!-- Machine à écrire -->
+            <div class="section-box">
+                <h3>⌨️ 2. La Machine à écrire (Lettre)</h3>
+                <textarea id="letter-input" rows="4" placeholder="Tape ta lettre ici... Elle s'affichera sur une vraie feuille à grain."></textarea>
             </div>
-            <button onclick="sealPackage()">Sceller le colis ✨</button>
-            <p id="link-output" style="word-wrap: break-word; font-size: 12px; margin-top: 20px; font-weight: bold;"></p>
+
+            <!-- Lecteur MP3 Apple -->
+            <div class="section-box">
+                <h3>🎧 3. Le MP3 Style Apple (Musique)</h3>
+                <input type="text" id="song-title-input" placeholder="Titre de la chanson & Artiste (ex: Sweet - Cigarettes After Sex)">
+                <input type="text" id="music-input" placeholder="Lien Spotify, Deezer ou YouTube (https://...)">
+            </div>
+
+            <!-- Polaroid Drag & Drop + Customisation -->
+            <div class="section-box">
+                <h3>📸 4. Le Polaroïd Customisable</h3>
+                <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+                    Glisse et dépose ta photo ici (ou clique pour choisir)<br>
+                    <small style="color:#777;">(Compression rétro automatique pour un lien court !)</small>
+                    <img id="polaroid-preview-img" src="">
+                </div>
+                <input type="file" id="file-input" accept="image/*" style="display:none">
+                
+                <input type="text" id="polaroid-caption-input" placeholder="Légende écrite au marqueur sous la photo...">
+                
+                <div class="custom-row">
+                    <div>
+                        <label style="font-size:12px;">Attache :</label>
+                        <select id="polaroid-attach-input">
+                            <option value="washi">Ruban Washi Tape rose</option>
+                            <option value="pin">Punaise rouge 📌</option>
+                            <option value="clip">Trombone métal 📎</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px;">Sticker sur le coin :</label>
+                        <select id="polaroid-sticker-input">
+                            <option value="❤️">Cœur rouge ❤️</option>
+                            <option value="⭐">Étoile dorée ⭐</option>
+                            <option value="✨">Étincelles ✨</option>
+                            <option value="🐾">Petites pattes 🐾</option>
+                            <option value="">Aucun sticker</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini outil de dessin -->
+            <div class="section-box">
+                <h3>🎨 5. Le Carnet de Croquis</h3>
+                <div class="canvas-container">
+                    <canvas id="drawing-canvas" width="240" height="170"></canvas>
+                    <div class="draw-tools">
+                        <div class="color-dot" style="background:#2b2523;" onclick="setPenColor('#2b2523')"></div>
+                        <div class="color-dot" style="background:#b83b3b;" onclick="setPenColor('#b83b3b')"></div>
+                        <div class="color-dot" style="background:#3b66b8;" onclick="setPenColor('#3b66b8')"></div>
+                        <div class="color-dot" style="background:#4a8f53;" onclick="setPenColor('#4a8f53')"></div>
+                        <button type="button" onclick="clearCanvas()" style="font-size:12px; cursor:pointer; border:1px solid #aaa; background:#fff; border-radius:4px; padding:2px 8px;">Effacer</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-main" onclick="sealPackage()">Sceller et générer le lien secret ✨</button>
+            
+            <div id="link-result-box" style="display:none; margin-top:20px; padding:15px; background:#fff; border:2px dashed #6e352c; text-align:center;">
+                <strong>Ton colis est prêt ! Voici le lien à envoyer :</strong><br><br>
+                <input type="text" id="generated-url" readonly style="text-align:center; font-size:12px;">
+                <button onclick="copyLink()" style="background:#4a8f53; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-family:'Courier Prime'; font-weight:bold; margin-top:5px;">Copier le lien 📋</button>
+                <span id="copy-confirm" style="display:block; font-size:12px; color:#4a8f53; margin-top:5px;"></span>
+            </div>
         </div>
 
-        <!-- 2. VUE DU COLIS (Visible pour ton ami) -->
-        <div id="package">
-            <img src="https://cdn-icons-png.flaticon.com/512/3258/3258525.png" alt="Cardboard Box" style="width: 120px; opacity: 0.9;">
-            <div class="box-title">you've got mail...</div>
-            
-            <div class="grid">
-                <div class="item" onclick="openModal('letter')">
-                    <!-- Remplace par l'image de ta machine à écrire -->
+        <!-- 3. VUE DE RÉCEPTION DU COLIS (OBJETS ÉPARPILLÉS DANS LA BOÎTE) -->
+        <div id="package-view">
+            <div class="shipping-header">
+                <h1 id="view-greeting">I've been thinking about you...</h1>
+                <div class="shipping-sub" id="view-recipient">DIGITAL CARE PACKAGE • HANDLE WITH CARE</div>
+            </div>
+
+            <div class="scattered-area">
+                <!-- Machine à écrire -->
+                <div class="scattered-item pos-typewriter" onclick="openImmersive('letter')">
+                    <div class="scrapbook-tape">read me ✎</div>
+                    <!-- ASTUCE: Tu peux remplacer ce lien par le nom de ton image sur GitHub (ex: typewriter.png) -->
                     <img src="https://cdn-icons-png.flaticon.com/512/3063/3063205.png" alt="Typewriter">
-                    <div class="item-label">note</div>
                 </div>
-                <div class="item" onclick="openModal('music')">
-                    <!-- Remplace par l'image de ton MP3 Apple -->
-                    <img src="https://cdn-icons-png.flaticon.com/512/17/17791.png" alt="MP3 Player">
-                    <div class="item-label">song</div>
+
+                <!-- MP3 Style Apple -->
+                <div class="scattered-item pos-ipod" onclick="openImmersive('music')">
+                    <div class="scrapbook-tape">play me ♫</div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/17/17791.png" alt="iPod MP3">
+                </div>
+
+                <!-- Polaroïd -->
+                <div class="scattered-item pos-polaroid" onclick="openImmersive('polaroid')">
+                    <div class="scrapbook-tape">look at this ♥</div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/3342/3342137.png" alt="Polaroid">
+                </div>
+
+                <!-- Carnet de croquis -->
+                <div class="scattered-item pos-sketch" onclick="openImmersive('sketch')">
+                    <div class="scrapbook-tape">for you ★</div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/2972/2972185.png" alt="Sketchbook">
                 </div>
             </div>
         </div>
-        
+
     </div>
 
-    <!-- 3. FENÊTRE POP-UP (S'ouvre au clic sur un objet) -->
-    <div id="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modal-body"></div>
-        </div>
+    <!-- 4. FENÊTRE DE ZOOM IMMERSIF -->
+    <div id="immersive-overlay" onclick="closeImmersive(event)">
+        <span class="close-immersive" onclick="document.getElementById('immersive-overlay').style.display='none'">&times;</span>
+        <div id="immersive-content" class="zoom-item-wrapper" onclick="event.stopPropagation()"></div>
     </div>
 
-    <!-- LE MOTEUR DU SITE -->
     <script>
-        let packageData = {};
-        
-        // Vérifie si on est dans l'atelier ou si on reçoit un colis
-        const urlParams = new URLSearchParams(window.location.search);
-        const boxCode = urlParams.get('box');
+        // --- 1. MINI OUTIL DE DESSIN (COMPRESSÉ POUR LE LIEN) ---
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let hasDrawn = false;
 
-        if (boxCode) {
-            // C'est ton ami qui ouvre le lien : on cache l'atelier, on montre le colis
-            document.getElementById('atelier').style.display = 'none';
-            document.getElementById('package').style.display = 'block';
-            
-            try {
-                // Décodage du secret
-                packageData = JSON.parse(decodeURIComponent(escape(atob(boxCode))));
-            } catch (e) {
-                document.getElementById('package').innerHTML = "<h2>Le colis est abîmé (lien invalide).</h2>";
-            }
+        // Fond blanc obligatoire pour compresser en JPEG très léger
+        function fillWhiteCanvas() {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        fillWhiteCanvas();
+        ctx.strokeStyle = '#2b2523';
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+
+        function setPenColor(color) { ctx.strokeStyle = color; }
+        function clearCanvas() { fillWhiteCanvas(); hasDrawn = false; ctx.beginPath(); }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
-        // Fonction pour créer le lien secret
-        function sealPackage() {
-            const data = {
-                letter: document.getElementById('letter-input').value,
-                music: document.getElementById('music-input').value
+        const startDraw = (e) => { isDrawing = true; hasDrawn = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); };
+        const moveDraw = (e) => { if (!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); };
+        const endDraw = () => { isDrawing = false; };
+
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', moveDraw);
+        window.addEventListener('mouseup', endDraw);
+        canvas.addEventListener('touchstart', startDraw, {passive: false});
+        canvas.addEventListener('touchmove', moveDraw, {passive: false});
+        window.addEventListener('touchend', endDraw);
+
+        // --- 2. GLISSER-DÉPOSER POLAROÏD & COMPRESSION RÉTRO AUTOMATIQUE ---
+        let compressedPhotoData = "";
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) processPhoto(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) processPhoto(e.target.files[0]);
+        });
+
+        function processPhoto(file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    // On réduit l'image en miniature rétro (max 150px) pour que le lien ne plante jamais
+                    const tempCanvas = document.createElement('canvas');
+                    const maxDim = 150;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > maxDim) { h *= maxDim / w; w = maxDim; } }
+                    else { if (h > maxDim) { w *= maxDim / h; h = maxDim; } }
+                    tempCanvas.width = w;
+                    tempCanvas.height = h;
+                    const tCtx = tempCanvas.getContext('2d');
+                    tCtx.drawImage(img, 0, 0, w, h);
+                    
+                    // Compression JPEG à 45% (donne un grain vintage et un texte très court)
+                    compressedPhotoData = tempCanvas.toDataURL('image/jpeg', 0.45);
+                    const preview = document.getElementById('polaroid-preview-img');
+                    preview.src = compressedPhotoData;
+                    preview.style.display = 'block';
+                };
+                img.src = event.target.result;
             };
-            // Transformation en lien
-            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-            const url = window.location.origin + window.location.pathname + "?box=" + encoded;
-            
-            // Affichage du lien
-            document.getElementById('link-output').innerHTML = `Copie ce lien et envoie-le :<br><br><a href="${url}" style="color:#8B3A3A;">${url}</a>`;
+            reader.readAsDataURL(file);
         }
 
-        // Fonctions pour le Pop-up
-        function openModal(type) {
-            const body = document.getElementById('modal-body');
-            if (type === 'letter') {
-                body.innerHTML = `<div class="typewriter-text">${packageData.letter || 'Rien d\'écrit...'}</div>`;
-            } else if (type === 'music') {
-                body.innerHTML = `🎵<br><br><a href="${packageData.music}" target="_blank" style="color:#8B3A3A; font-weight:bold; text-decoration:none;">Lancer la piste audio</a>`;
+        // --- 3. SCELLER LE COLIS (COMPRESSION LZ-STRING) ---
+        function sealPackage() {
+            // Compression du dessin en JPEG ultra-léger
+            let sketchData = "";
+            if (hasDrawn) {
+                const smallSketch = document.createElement('canvas');
+                smallSketch.width = 160; smallSketch.height = 115;
+                smallSketch.getContext('2d').drawImage(canvas, 0, 0, 160, 115);
+                sketchData = smallSketch.toDataURL('image/jpeg', 0.45);
             }
-            document.getElementById('modal').style.display = 'flex';
+
+            const payload = {
+                g: document.getElementById('greeting-input').value,
+                r: document.getElementById('recipient-input').value,
+                l: document.getElementById('letter-input').value,
+                st: document.getElementById('song-title-input').value,
+                m: document.getElementById('music-input').value,
+                p: compressedPhotoData,
+                pc: document.getElementById('polaroid-caption-input').value,
+                pa: document.getElementById('polaroid-attach-input').value,
+                ps: document.getElementById('polaroid-sticker-input').value,
+                d: sketchData,
+                t: new Date().getTime()
+            };
+
+            // Compression maximale pour l'URL
+            const compressedCode = LZString.compressToEncodedURIComponent(JSON.stringify(payload));
+            const finalUrl = window.location.origin + window.location.pathname + "?box=" + compressedCode;
+
+            document.getElementById('generated-url').value = finalUrl;
+            document.getElementById('link-result-box').style.display = 'block';
         }
 
-        function closeModal() { 
-            document.getElementById('modal').style.display = 'none'; 
+        function copyLink() {
+            const urlField = document.getElementById('generated-url');
+            urlField.select();
+            navigator.clipboard.writeText(urlField.value);
+            document.getElementById('copy-confirm').innerText = "Lien copié ! Tu peux l'envoyer ♥";
+        }
+
+        // --- 4. LECTURE DU COLIS & EXPIRATION 48H ---
+        let boxData = {};
+        const urlParams = new URLSearchParams(window.location.search);
+        const rawBox = urlParams.get('box');
+
+        if (rawBox) {
+            document.getElementById('atelier').style.display = 'none';
+            try {
+                // Décompression LZString (ou ancien format base64 par sécurité)
+                const jsonString = LZString.decompressFromEncodedURIComponent(rawBox) || decodeURIComponent(escape(atob(rawBox)));
+                boxData = JSON.parse(jsonString);
+
+                const hoursElapsed = (new Date().getTime() - (boxData.t || 0)) / (1000 * 60 * 60);
+                if (hoursElapsed > 48) {
+                    document.getElementById('expired-view').style.display = 'block';
+                } else {
+                    document.getElementById('package-view').style.display = 'block';
+                    if (boxData.g) document.getElementById('view-greeting').innerText = boxData.g;
+                    if (boxData.r) document.getElementById('view-recipient').innerText = boxData.r.toUpperCase();
+                }
+            } catch (err) {
+                document.getElementById('expired-view').style.display = 'block';
+            }
+        }
+
+        // --- 5. OUVERTURE DES ZOOMS IMMERSIFS ---
+        function openImmersive(type) {
+            const container = document.getElementById('immersive-content');
+            
+            if (type === 'letter') {
+                const text = boxData.l || "Just a little note to say you're amazing ♥";
+                container.innerHTML = `<div class="zoomed-paper">${text}</div>`;
+            } 
+            else if (type === 'music') {
+                const songTitle = boxData.st || "Mystery Track ♫";
+                const songUrl = boxData.m || "#";
+                container.innerHTML = `
+                    <div class="zoomed-ipod">
+                        <div class="ipod-screen">
+                            <div class="ipod-topbar"><span>iPod</span><span>🔋</span></div>
+                            <div style="font-size:13px; font-weight:bold; margin-top:10px;">Now Playing</div>
+                            <div style="font-size:14px; color:#2b3a30; margin:8px 0;">${songTitle}</div>
+                            <div style="font-size:10px; color:#556b5d;">0:42 ━━━━●────── 3:15</div>
+                        </div>
+                        <div class="ipod-wheel">
+                            <span class="wheel-label w-menu">MENU</span>
+                            <span class="wheel-label w-prev">⏮</span>
+                            <span class="wheel-label w-next">⏭</span>
+                            <span class="wheel-label w-play">⏯</span>
+                            <a href="${songUrl}" target="_blank" class="ipod-center-btn">PLAY ▶</a>
+                        </div>
+                    </div>`;
+            } 
+            else if (type === 'polaroid') {
+                const photoSrc = boxData.p || "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300";
+                const caption = boxData.pc || "us ♥";
+                const sticker = boxData.ps || "";
+                let attachHtml = `<div class="attach-washi"></div>`;
+                if (boxData.pa === 'pin') attachHtml = `<div class="attach-pin">📌</div>`;
+                if (boxData.pa === 'clip') attachHtml = `<div class="attach-clip">📎</div>`;
+
+                container.innerHTML = `
+                    <div class="zoomed-polaroid">
+                        ${attachHtml}
+                        <img src="${photoSrc}" alt="Memory">
+                        <div class="polaroid-sticker">${sticker}</div>
+                        <div class="polaroid-caption">${caption}</div>
+                    </div>`;
+            } 
+            else if (type === 'sketch') {
+                const sketchSrc = boxData.d;
+                const innerSketch = sketchSrc 
+                    ? `<img src="${sketchSrc}" alt="Sketch">` 
+                    : `<p style="padding:40px; font-family:'Caveat'; font-size:26px;">(Un petit dessin invisible ♥)</p>`;
+                container.innerHTML = `
+                    <div class="zoomed-sketchbook">
+                        ${innerSketch}
+                        <div style="font-family:'Caveat', cursive; font-size:20px; color:#666; margin-top:8px;">drawn for you ★</div>
+                    </div>`;
+            }
+
+            document.getElementById('immersive-overlay').style.display = 'flex';
+        }
+
+        function closeImmersive(e) {
+            if (e.target.id === 'immersive-overlay') {
+                document.getElementById('immersive-overlay').style.display = 'none';
+            }
         }
     </script>
 </body>
