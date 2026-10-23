@@ -649,15 +649,14 @@
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length) processPhoto(e.target.files[0]);
         });
-
-        function processPhoto(file) {
+function processPhoto(file) {
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
-                    // On réduit l'image en miniature rétro (max 150px) pour que le lien ne plante jamais
+                    // ENTRE-DEUX : 250px au lieu de 150px (Image beaucoup plus nette)
                     const tempCanvas = document.createElement('canvas');
-                    const maxDim = 150;
+                    const maxDim = 250; 
                     let w = img.width, h = img.height;
                     if (w > h) { if (w > maxDim) { h *= maxDim / w; w = maxDim; } }
                     else { if (h > maxDim) { w *= maxDim / h; h = maxDim; } }
@@ -666,8 +665,8 @@
                     const tCtx = tempCanvas.getContext('2d');
                     tCtx.drawImage(img, 0, 0, w, h);
                     
-                    // Compression JPEG à 45% (donne un grain vintage et un texte très court)
-                    compressedPhotoData = tempCanvas.toDataURL('image/jpeg', 0.45);
+                    // ENTRE-DEUX : Qualité à 0.65 (65%) au lieu de 0.45
+                    compressedPhotoData = tempCanvas.toDataURL('image/jpeg', 0.65);
                     const preview = document.getElementById('polaroid-preview-img');
                     preview.src = compressedPhotoData;
                     preview.style.display = 'block';
@@ -676,7 +675,6 @@
             };
             reader.readAsDataURL(file);
         }
-
         // --- 3. SCELLER LE COLIS (COMPRESSION LZ-STRING) ---
         function sealPackage() {
             // Compression du dessin en JPEG ultra-léger
@@ -704,7 +702,7 @@
 
             // Compression maximale pour l'URL
             const compressedCode = LZString.compressToEncodedURIComponent(JSON.stringify(payload));
-            const finalUrl = window.location.origin + window.location.pathname + "?box=" + compressedCode;
+            const finalUrl = window.location.origin + window.location.pathname + "#box=" + compressedCode;
 
             document.getElementById('generated-url').value = finalUrl;
             document.getElementById('link-result-box').style.display = 'block';
@@ -720,7 +718,7 @@
         // --- 4. LECTURE DU COLIS & EXPIRATION 48H ---
         let boxData = {};
         const urlParams = new URLSearchParams(window.location.search);
-        const rawBox = urlParams.get('box');
+        const rawBox = new URLSearchParams(window.location.hash.substring(1)).get('box') || new URLSearchParams(window.location.search).get('box');
 
         if (rawBox) {
             document.getElementById('atelier').style.display = 'none';
